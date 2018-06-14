@@ -2,14 +2,42 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ip = require('ip');
-
+const readline = require('readline');
+var idToBan = '';
 var usrNum = 0;
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+/*
+inputs();
+
+function inputs() {
+    rl.question('', (answer) => {
+        idToBan = answer;
+        try {
+            if (idToBan !== '') {
+                var selectedSocket = io.to(idToBan);
+                selectedSocket.disconnect();
+                console.log('Kicked: ' + idToBan);
+                inputs();
+            }
+        } catch (e) {
+            console.log('Failed');
+            inputs();
+        }
+    });
+}*/
+
+
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', function(socket){
+
 
     socket.on('chat message', function(msg){
         io.emit('chat message', msg);
@@ -19,7 +47,7 @@ io.on('connection', function(socket){
     console.log('a user connected (' + usrNum + ')');
     socket.on('userAdd', function(name){
         socket.username = name;
-        console.log(name + ' has joined the chat');
+        console.log(name + ' has joined the chat(' + socket.id + ')');
         socket.broadcast.emit('userAdded', {
             name: name,
             usrNum: usrNum
@@ -49,6 +77,8 @@ io.on('connection', function(socket){
             name: socket.username
         });
     });
+
+
 
 
 });

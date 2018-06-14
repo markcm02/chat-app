@@ -1,11 +1,12 @@
 -----------------------------------------------------------------------
-14/06/2018
+15/06/2018
 -----------------------------------------------------------------------
 **Added:**
  + Server IP and port displayed on startup
  + Live user count
  + User join and leave message broadcast with username shown
  + User is typing
+ + Empty messaged filter
 -----------------------------------------------------------------------
 **Todo:**
  + Spam Handler
