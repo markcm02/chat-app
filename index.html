@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        #sendMessages { padding: 3px; position: fixed; bottom: 0; width: 100%; background: white; }
+        #sendMessages div { margin: 0; }
+        #messages { list-style-type: none; margin: 0; padding: 0; }
+        #messages li { padding: 5px 10px; }
+        #messages li:nth-child(odd) { background: #eee; }
+        #chat {display: none}
+        #allMessages { overflow-y: scroll; height: 85%; position: fixed; width: 100% }
+    </style>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<body>
+<div class="row">
+    <div class="col s12 m4 offset-m4">
+        <div id="login" class="card-panel">
+            <h4>Login</h4>
+            <form id="username">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="name" type="text" autocomplete="off">
+                        <label for="name">Name</label>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light">Submit
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="chat">
+    <div id="allMessages">
+        <ul id="messages"></ul>
+        <div id="marker"></div>
+    </div>
+    <div>
+        <form action="" id="sendMessages">
+            <div id="typingWrap">
+                <p id="types"></p>
+            </div>
+            <div class="row">
+                <div class="input-field col s10">
+                    <input class="input" id="m" type="text" autocomplete="off">
+                    <label for="m">Message</label>
+                </div>
+
+                <div class="col s2">
+                    <button class="btn-large waves-effect waves-light">Send
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+    $(function () {
+        var TYPING_TIMER_LENGTH = 2000;
+        var lastTypingTime;
+        var typing = false;
+        var connected = false;
+        var $window = $(window);
+
+        $("#chat").hide();
+        var name = "";
+        var socket = io();
+        $('#username').submit(function () {
+            name = $('#name').val();
+            $("#chat").show();
+            $("#login").hide();
+            socket.emit('userAdd', name);
+            connected = true;
+            return false;
+        });
+        $('#sendMessages').submit(function(){
+            socket.emit('chat message', name + ': ' + $('#m').val());
+            $('#m').val('');
+            socket.emit('stop typing');
+            typing = false;
+            return false;
+        });
+
+        $window.keydown(event => {
+            // Auto-focus the current input when a key is typed
+            if (!(event.ctrlKey || event.metaKey || event.altKey)) {
+                updateTyping();
+            }
+        });
+
+        //Broadcasts user joined message
+        socket.on('userAdded', (data) => {
+            $('#messages').append($('<li>').text('System: ' + data.name + ' has joined. ' + data.usrNum + ' users online.'));
+        });
+
+        socket.on('userLeft', (data) => {
+            $('#messages').append($('<li>').text('System: ' + data.name + ' has left. ' + data.usrNum + ' user/s online.'));
+        });
+
+        const updateTyping = () => {
+            if (connected) {
+                if (!typing) {
+                    typing = true;
+                    socket.emit('typing', name);
+                }
+                lastTypingTime = (new Date()).getTime();
+
+                setTimeout(() => {
+                    var typingTimer = (new Date()).getTime();
+                    var timeDiff = typingTimer - lastTypingTime;
+                    if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
+                        socket.emit('stop typing');
+                        typing = false;
+                    }
+                }, TYPING_TIMER_LENGTH);
+            }
+        }
+
+        socket.on('typing', (data) => {
+            //user is typing
+            console.log(data.name + ' is typing');
+            document.getElementById("types").textContent = data.name + " is typing...";
+        });
+
+        socket.on('stop typing', (data) => {
+            //user has stopped typing
+            console.log(data.name + ' yesnt typing');
+            document.getElementById("types").textContent="";
+        });
+
+        socket.on('chat message', function(msg){
+            $('#messages').append($('<li>').text(msg));
+            document.getElementById("marker").scrollIntoView();
+        });
+        // socket.on('connected', function () {
+        //
+        // })
+
+    });
+</script>
+</body>
+</html>
