@@ -1,0 +1,36 @@
+#sendMessages {
+    padding: 3px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+}
+
+#sendMessages div {
+    margin: 0;
+}
+
+#messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#messages li {
+    padding: 5px 10px;
+}
+
+#messages li:nth-child(odd) {
+    background: #eee;
+}
+
+#chat {
+    display: none
+}
+
+#allMessages {
+    overflow-y: scroll;
+    height: 85%; 
+    position: fixed;
+    width: 100%
+}
