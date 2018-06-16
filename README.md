@@ -1,3 +1,14 @@
+Chat-App
+-----------------------------------------------------------------------
+**Requirements**
+ + NodeJS
+ 
+**To run**
+******Windows******
+ + Run start.ps1 with powershell
+******Other******
+ + Run index.js with nodeJS on server 
+ 
 As of 16/06/2018
 -----------------------------------------------------------------------
 **Features:**
