@@ -1,4 +1,4 @@
-As of 15/06/2018
+As of 16/06/2018
 -----------------------------------------------------------------------
 **Features:**
  + Server IP and port displayed on startup
