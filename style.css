@@ -30,7 +30,7 @@
 
 #allMessages {
     overflow-y: scroll;
-    height: 85%; 
+    height: 85%;
     position: fixed;
     width: 100%
 }
